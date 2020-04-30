@@ -8,11 +8,11 @@ Eigen value files:<br />
 Those two files included in folder “eigen utils” are deprecated. They are canned routines to perform eigen decomposition but not successfully integrated in the environment of this C project.<br />
 
 Python:<br />
-There is a python notebook included in SVD folder to compare the result in the demo to the correct result. You can visit [ipynb]https://github.com/AntoineWY/ECSE-444-Final-Project-Linear-System-Solver-and-Optimization/blob/master/SVD/Eigen%20Calculation%20and%20answer%20validation.ipynb to see example output corresponding to the demo.
+There is a python notebook included in SVD folder to compare the result in the demo to the correct result. You can visit (ipynb)https://github.com/AntoineWY/ECSE-444-Final-Project-Linear-System-Solver-and-Optimization/blob/master/SVD/Eigen%20Calculation%20and%20answer%20validation.ipynb to see example output corresponding to the demo.
 
 Data:<br />
 For testing data of the entire group please refer to spread sheet “ecse-444-test-data” in red section for SVD.<br />
 Exploring new matrix?<br />
 As explained in the report, the implementation of the algorithm is interrupted by the python injection of eigen decomposition result. Thus, every time a new matrix wanted to be tried out, you should perform eigen decomposition in python notebook first, get the result copied in C code and run again.
 
-Instructions (for the major C matrix solver LU/QR/Cholesky): [readme.txt]https://github.com/AntoineWY/ECSE-444-Final-Project-Linear-System-Solver-and-Optimization/blob/master/Cholesky_QR_LU/readme.txt
+Instructions (for the major C matrix solver LU/QR/Cholesky): (readme.txt)https://github.com/AntoineWY/ECSE-444-Final-Project-Linear-System-Solver-and-Optimization/blob/master/Cholesky_QR_LU/readme.txt

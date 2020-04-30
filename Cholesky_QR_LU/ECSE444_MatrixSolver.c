@@ -2,7 +2,7 @@
  ============================================================================
  Name        : ECSE444_MatrixSolver.c
  Author      : Jiahua Liang, Kevin Chen, Xiangyun Wang, Yinuo Wang
- Version     : 1.0
+ Version     : 1.1
  Copyright   : Your copyright notice
  Description : Matrix Solver in C, Ansi-style
  ============================================================================
@@ -13,6 +13,9 @@
 #include <math.h>
 
 //----------General function-------------
+/*
+ * Forward substitution function
+ */
 double *forward_optimized(double *L, double *b, int n){
 	double *x = (double*)calloc(n,sizeof(double));
 	for(int i = 0; i<n;i++){
@@ -20,11 +23,15 @@ double *forward_optimized(double *L, double *b, int n){
 		for (int j = 0; j<i; j++){
 			x[i] -= L[i*n+j]*x[j];
 		}
+		if(L[i*n+i] == 0) return NULL;
 		x[i] /= L[i*n+i];
 	}
 	return x;
 }
 
+/*
+ * Backward substitution function
+ */
 double *backward_optimized(double *U, double *b, int n){
 	double *x = (double*)calloc(n,sizeof(double));
 	for(int i = n-1; i>(-1);i--){
@@ -33,10 +40,27 @@ double *backward_optimized(double *U, double *b, int n){
 			x[i] -= U[i*n+j]*x[j];
 		}
 		x[i] /= U[i*n+i];
+		if(U[i*n+i] == 0) return NULL;
 	}
 	return x;
 }
 
+/*
+ * Compute the dot product of a matrix and a vector
+ */
+double* dotproduct(int m, double* mat, double* vec){
+	double* out = (double*)calloc(m, sizeof(double));
+	for (int i = 0; i<m; i++){
+		for (int j = 0; j<m;j++){
+			out[i] += mat[i*m+j]*vec[j];
+		}
+	}
+	return out;
+}
+
+/*
+ * Print matrix in a desired format
+ */
 void printM (double *A, int n){
 	for (int i = 0; i < n; i++) {
 		printf("[");
@@ -47,6 +71,9 @@ void printM (double *A, int n){
 	}
 }
 
+/*
+ * Print vector in a desired format
+ */
 void printV (double *B, int n){
 	printf("[");
 	for (int i = 0; i<n-1; i++){
@@ -56,6 +83,9 @@ void printV (double *B, int n){
 	printf("] \n");
 }
 
+/*
+ * Copy a matrix to a block of newly allocated memory
+ */
 double* copymatrix(double* A, int n){
 	double* out = (double*)calloc(n * n, sizeof(double));
 	for (int i = 0; i<n; i++){
@@ -66,9 +96,26 @@ double* copymatrix(double* A, int n){
 	return out;
 }
 
+/*
+ * Compute the forward of the matrix problem
+ * (Problem has form Ax=b, compute Ax-b after getting x)
+ */
+double computeError(double* A, double* b, double* x, int n){
+	double error = 0;
+	double* bb = dotproduct(n, A, x);
+	for (int i = 0; i<n; i++){
+		error += fabs(b[i]-bb[i]);
+	}
+	return error;
+}
+
 //-----------------General function end----------------------
 
 //------------------Cholesky Decomposition--------------------
+/*
+ * Given matrix A, want A = L*transpose(L)
+ * This function returns L
+ */
 double *cholesky_optimized(double *A, int n) {
     double *L = (double*)calloc(n * n, sizeof(double));
     for (int i = 0; i < n; i++){
@@ -87,6 +134,13 @@ double *cholesky_optimized(double *A, int n) {
     return L;
 }
 
+/*
+ * An optimized backward substitution only for Cholesky Decomposition Solver.
+ * Backward substitution is usually for upper triangular matrix.
+ * Cholesky requires to backward substitute the transpose of a lower triangular matrix.
+ * Instead of transpose a matrix and do backward substitution, we can directly do backward
+ * substitution for a lower triangular matrix, with some changes on the for loop order.
+ */
 double *backward_cholesky(double *U, double *b, int n){
 	double *x = (double*)calloc(n,sizeof(double));
 	for(int j = n-1; j>(-1);j--){
@@ -95,20 +149,28 @@ double *backward_cholesky(double *U, double *b, int n){
 			x[j] -= U[i*n+j]*x[i];
 		}
 		x[j] /= U[j*n+j];
+		if(U[j*n+j] == 0) return NULL;
 	}
 	return x;
 }
 
+/*
+ * Solve matrix using Cholesky decomposition
+ */
 double *choleskySolver(double *A, double *b, int n){
 	double *L = cholesky_optimized(A, n);
 	if(L==NULL) return NULL;
 	double *y = forward_optimized(L, b, n);
+	if(y==NULL) return NULL;
 	double *x = backward_cholesky(L, y, n);
 	free(L);
 	free(y);
 	return x;
 }
 
+/*
+ * Check if the matrix is symmetric or not
+ */
 int checkSymetric(double *input, int n){
 	for (int i = 0; i<n; i++){
 		for (int j = 0; j<i; j++){
@@ -121,6 +183,9 @@ int checkSymetric(double *input, int n){
 }
 //-------------Cholesky Decomposition End--------------
 //-------------QR deconposition -----------------------
+/*
+ * Compute the dot product of two columns of a matrix
+ */
 double dot(int m, double* mat, int col1, int col2){
 	double output = 0;
 	for(int i = 0 ; i < m; i++){
@@ -129,6 +194,9 @@ double dot(int m, double* mat, int col1, int col2){
 	return output;
 }
 
+/*
+ * Compute the norm of a column of a matrix
+ */
 double norm(int m, double* mat,int col){
 	double output = 0;
 	for(int i = 0 ; i < m; i++){
@@ -138,6 +206,9 @@ double norm(int m, double* mat,int col){
 	return sqrt(output);
 }
 
+/*
+ * transpose a matrix
+ */
 void transpose(int m, double* mat){
 	double temp;
 	for(int i = 0 ; i < m; i++){
@@ -149,6 +220,9 @@ void transpose(int m, double* mat){
 	}
 }
 
+/*
+ * compute the norm vector of a column of a matrix
+ */
 int unit(int m, double* mat, int col){
 	double matNorm = norm(m,mat,col);
 	if (matNorm == 0) return 0;
@@ -158,6 +232,9 @@ int unit(int m, double* mat, int col){
 	return 1;
 }
 
+/*
+ * Compute Q in the QR decomposition
+ */
 double* decompQ(int m, double* mat){
 	double* output = copymatrix(mat, m);
 	int check = unit(m,output,0);
@@ -175,6 +252,9 @@ double* decompQ(int m, double* mat){
 	return output;
 }
 
+/*
+ * Compute R in the QR decomposition
+ */
 double* decompR(int m, double* mat,double* Q){
 	double* R = (double*)calloc(m * m, sizeof(double));
 	double* tempQ = copymatrix(Q, m);
@@ -192,16 +272,9 @@ double* decompR(int m, double* mat,double* Q){
 	return R;
 }
 
-double* dotproduct(int m, double* mat, double* vec){
-	double* out = (double*)calloc(m, sizeof(double));
-	for (int i = 0; i<m; i++){
-		for (int j = 0; j<m;j++){
-			out[i] += mat[i*m+j]*vec[j];
-		}
-	}
-	return out;
-}
-
+/*
+ * Solve matrix using QR decomposition
+ */
 double* QRSolver(double* mat, double* b, int m){
 	double* Q = decompQ(m,mat);
 	if(Q==NULL) return NULL;
@@ -215,7 +288,10 @@ double* QRSolver(double* mat, double* b, int m){
 	return x;
 }
 //----------QR Decomposition end---------------
-//---------------
+//---------------LU Decomposition Start----------------
+/*
+ * Compute L and U for LU decomposition
+ */
 int doolittleLU(int n, double* A, double* L, double* U){ // n is the size of the input matrix
     for (int i = 0; i < n; i++) {  		// for row i in U, i.e i th iteration
         for (int k = i; k < n; k++) { 	// for k th entry in row i of U
@@ -245,70 +321,78 @@ int doolittleLU(int n, double* A, double* L, double* U){ // n is the size of the
     return 1;
 }
 
+/*
+ * Use L and U with forward and backward substitution to solve the matrix
+ */
 double* LUSolver(double* A, double*b, int n){
 	double* L = (double*)calloc(n * n, sizeof(double));
 	double* U = (double*)calloc(n * n, sizeof(double));
 	int check = doolittleLU(n, A, L, U);
 	if (check == 0) return NULL;
 	double* y = forward_optimized(L, b, n);
+	if(y==NULL) return NULL;
 	double* x = backward_optimized(U, y, n);
+	free(L);
+	free(U);
+	free(y);
 	return x;
 }
-//----------------
+//----------------LU decomposition End--------------------
 //----------Matrix Solver----------------------
 int main(void) {
 	setbuf(stdout, NULL);
 	printf("The matrix problem is in the form of: Ax=b \n1. 'A' is a square matrix. \n2. 'b' is the result wanted. \n3. 'x' is the solution to the linear system. \n\n");
 	int n = 0;
 	printf("Size of matrix: ");
-	scanf("%d", &n);
+	scanf("%d", &n);	//user input for matrix size
 	double *input = (double*)calloc(n * n, sizeof(double));
 	double *b = (double*)calloc(n, sizeof(double));
 	printf("A: \n");
-	for (int i = 0; i<n; i++){
+	for (int i = 0; i<n; i++){				//user input for matrix to be solved
 		for (int j = 0; j < n; j++){
 			printf("[%d][%d]= ", i, j);
 			scanf("%lf",&input[i*n+j]);
 		}
 	}
-	printf("b: \n");
+	printf("b: \n");						//user input for the right hand side of the problem
 	for (int i = 0; i<n; i++){
 		printf("[%d]= ", i);
 		scanf("%lf", &b[i]);
 	}
-	int condition = 0;
+	int condition = 0;			//condition number is predefined to )
 	printf("Is the matrix well-conditioned? (0/1) (0 for 'no', 1 for 'yes'; if not sure, type '0'): \n");
-	scanf("%d", &condition);
-	printf("A = \n");
+	scanf("%d", &condition);	//ask user for condition number
+	printf("A = \n");			//print problem given
 	printM(input, n);
 	printf("\nb = \n");
 	printV(b,n);
 	printf("\n");
 
-	int symetric = checkSymetric(input, n);
+	int symetric = checkSymetric(input, n);		//check if symmetric
 	double* answer = NULL;
 
-	if(condition){
-		if(symetric) answer = choleskySolver(input, b, n);
-		if(answer != NULL){
-			printf("Cholesky Decomposition Method is used. \n\nAnswer x = \n");
-			printV(answer,n);
-			return 0;
-		}
-
+	if(condition){		//if problem well conditioned, use LU decomposition
 		answer = LUSolver(input, b, n);
 		if(answer != NULL){
 			printf("LU Decomposition Method is used. \n\nAnswer x = \n");
 			printV(answer,n);
 			return 0;
 		}
+	}else{			//if not well conditioned, use cholesky or QR
+		if(symetric) answer = choleskySolver(input, b, n);		//if symmetrix, try Cholesky
+		if(answer != NULL){
+			printf("Cholesky Decomposition Method is used. \n\nAnswer x = \n");
+			printV(answer,n);
+			return 0;
+		}		//if not symmetric, or Cholesky failed, use QR
+		answer = QRSolver(input, b, n);
+		if(computeError(input, b, answer, n) > 0.1) answer = NULL;
+		if(answer != NULL){
+			printf("QR Decomposition Method is used. \n\nAnswer x= \n");
+			printV(answer,n);
+			return 0;
+		}
 	}
-	answer = QRSolver(input, b, n);
-	if(answer == NULL){
-		printf("Cannot solve the matrix...");
-	}else{
-		printf("QR Decomposition Method is used. \n\nAnswer x= \n");
-		printV(answer,n);
-	}
+	printf("Matrix cannot be solved...\n"); //if matrix is not solvable
 	return 0;
 }

@@ -2,7 +2,7 @@
 Instructions (for SVD):
 SVD files: SVD.c. floatSVD.c, float_mem_SVD.c and float_mem_vectorized_SVD.c<br />
 To see demos, simply compile the corresponding file with command "gcc -o" and run the .exe. Each file is a stand-alone program with its own set of implementation and independent drivers. <br />
-Two matrix printed are original matrix and the covariance matrix (its transpose dot itself). You can use printMatrix(size) to see more n-by-n matrices.
+Two matrix printed are original matrix and the covariance matrix (its transpose dot itself), together with the time elapsed for 100000 iterations and the final correct solution. You can use printMatrix(size) to see more n-by-n matrices.
 
 Eigen value files:<br />
 Those two files included in folder “eigen utils” are deprecated. They are canned routines to perform eigen decomposition but not successfully integrated in the environment of this C project.<br />

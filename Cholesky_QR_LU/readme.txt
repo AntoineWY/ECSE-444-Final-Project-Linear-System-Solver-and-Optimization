@@ -2,15 +2,16 @@ Welcome to the Square Matrix Solver!!!
 
 The attached C file is designed to be exceted using gcc in the Trottier Linux Environment. 
 
-Instructions on How to Run
+Instructions on How to Run (* file name is 'ECSE444_MatrixSolver')
 
 1.  In the Linux terminal, navigate to the folder where you put the C file
 
 2. Compile the C file using gcc, make sure you use the c99 mode of gcc. 
-//--------------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------
 ** If you are too lazy, just copy and paste the following command to the terminal:
-gcc ECSE444_MatrixSolver.c -o main -std=c99 -lm
-//--------------------------------------------------------------------------------------
+** Default level optimization command: gcc ECSE444_MatrixSolver.c -o main -std=c99 -lm
+** Level 0 optimization command (if you need): gcc -O0 ECSE444_MatrixSolver.c -o main -std=c99 -lm
+*/--------------------------------------------------------------------------------------
 
 3. Execute the executable file you just created. 
 (The executable file is called "main" if you copied and pasted the command above...

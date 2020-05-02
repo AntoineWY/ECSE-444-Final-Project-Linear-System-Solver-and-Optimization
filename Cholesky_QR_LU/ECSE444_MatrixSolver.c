@@ -2,7 +2,7 @@
  ============================================================================
  Name        : ECSE444_MatrixSolver.c
  Author      : Jiahua Liang, Kevin Chen, Xiangyun Wang, Yinuo Wang
- Version     : 1.1
+ Version     : 1.2
  Copyright   : Your copyright notice
  Description : Matrix Solver in C, Ansi-style
  ============================================================================
@@ -386,7 +386,7 @@ int main(void) {
 			return 0;
 		}		//if not symmetric, or Cholesky failed, use QR
 		answer = QRSolver(input, b, n);
-		if(computeError(input, b, answer, n) > 0.1) answer = NULL;
+		if(answer != NULL && computeError(input, b, answer, n) > 0.1) answer = NULL;
 		if(answer != NULL){
 			printf("QR Decomposition Method is used. \n\nAnswer x= \n");
 			printV(answer,n);
